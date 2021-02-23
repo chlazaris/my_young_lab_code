@@ -1,0 +1,6 @@
+library("org.Hs.eg.db")
+keytypes(org.Hs.eg.db)
+#my_keys <- keys(org.Hs.eg.db) 
+df <- select(org.Hs.eg.db, columns=c("SYMBOL","GENENAME"), keytype="ENSEMBL")
+head(df)
+write.table(df, "ensembl_id_gene_mappings.tsv", col.names=TRUE, row.names=FALSE, sep="\t", quote=FALSE)

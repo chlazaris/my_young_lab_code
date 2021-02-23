@@ -1,0 +1,1 @@
+rsync -avr --progress /lab/solexa_young/young_ata4/WORKSHOP/Munshi_MM /lab/solexa_scratch/lazaris/
