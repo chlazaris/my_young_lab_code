@@ -35,6 +35,9 @@ pData(rawData)
 normData <- oligo::rma(rawData, normalize=T, background=T)
 #normData
 
+# Annotate Data
+normData <- annotateEset(normData, type="core", pd.hugene.1.0.st.v1)
+
 ## --Plot the norm data--
 pdf("norm_data_boxplot.pdf")
 boxplot(exprs(normData))
@@ -46,13 +49,17 @@ mmData$treatment <- factor(c("DMSO","DMSO","JQ1","JQ1"))
 
 # Apply the limma model
 design <- model.matrix(~mmData$treatment - 1)
+design 
 colnames(design) <- c("DMSO", "JQ1")
 fit <- lmFit(mmData, design)
 contrast.matrix <- makeContrasts("JQ1-DMSO", levels=design)
 contrast.matrix
 fitC <- contrasts.fit(fit, contrast.matrix)
 fitC <- eBayes(fitC)
-topTable(fitC)
+de_genes <- topTable(fitC, coef=1, lfc=1, number=Inf, p.value=0.05, adjust.method="BH")
+de_genes <- de_genes[,2:ncol(de_genes)]
+de_genes <- de_genes[!duplicated(de_genes),]
+write.table(de_genes, "diff_expressed_genes.tsv", row.names=F, col.names=T, sep="\t", quote=F)
 
 ## --write to file
 #df <- exprs(normData)[1:nrow(normData),1:ncol(normData)]
