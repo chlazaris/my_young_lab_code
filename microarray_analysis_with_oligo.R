@@ -13,6 +13,7 @@ library(oligo)
 library(GEOquery)
 library(affycoretools)
 library(limma)
+library(dplyr)
 
 ## ---getData---
 #getGEOSuppFiles("GSE31365")
@@ -36,7 +37,7 @@ normData <- oligo::rma(rawData, normalize=T, background=T)
 #normData
 
 # Annotate Data
-normData <- annotateEset(normData, type="core", pd.hugene.1.0.st.v1)
+normData <- annotateEset(normData, columns = c("PROBEID", "ENTREZID", "SYMBOL", "GENENAME"), type="core", pd.hugene.1.0.st.v1)
 
 ## --Plot the norm data--
 pdf("norm_data_boxplot.pdf")
@@ -59,10 +60,11 @@ fitC <- eBayes(fitC)
 de_genes <- topTable(fitC, coef=1, lfc=1, number=Inf, p.value=0.05, adjust.method="BH")
 de_genes <- de_genes[,2:ncol(de_genes)]
 de_genes <- de_genes[!duplicated(de_genes),]
-write.table(de_genes, "diff_expressed_genes.tsv", row.names=F, col.names=T, sep="\t", quote=F)
+# Romove the ones where the identifier in not available
+de_genes <- data.frame(subset(de_genes, !is.na(de_genes$ID)))
 
-## --write to file
-#df <- exprs(normData)[1:nrow(normData),1:ncol(normData)]
-#head(df)
-#pdata <- pData(eset)
-#d <- cbind(pdata, t(m))
+# Select the one with the highest average expression when the gene is the same
+de_genes <- de_genes %>% group_by(SYMBOL) %>% top_n(n=1, wt=AveExpr) %>% data.frame()
+head(de_genes)
+# Write to a file
+write.table(de_genes, "diff_expressed_genes.tsv", row.names=F, col.names=T, sep="\t", quote=F)
