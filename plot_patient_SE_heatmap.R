@@ -1,6 +1,7 @@
 #!/bin/Rscript
 library(dplyr)
 library(reshape2)
+library(ComplexHeatmap)
 
 # Import the data
 data <- read.table("select_SE_genes_per_patient.tsv", header=F, sep="\t")
@@ -23,8 +24,8 @@ rownames(m) <- df$donor
 color_palette <- c('#ef8a62', '#67a9cf')
 
 # Create the heatmap
-pdf("heatmap.pdf", height=25, width=10, useDingbats=FALSE)
-heatmap(m, scale="none", col=rev(color_palette))
+pdf("heatmap.pdf", useDingbats=FALSE)
+Heatmap(m, col=rev(color_palette), show_column_dend = FALSE, show_row_dend = FALSE)
 dev.off()
 
 
