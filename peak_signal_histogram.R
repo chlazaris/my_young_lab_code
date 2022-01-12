@@ -40,11 +40,11 @@ dev.off()
 select_data <- subset(joined_data, joined_data$Gene.Name %in% c("TIMM22", "LARS", "GSK3A", "FTO", "PANK3", "TSC2", "CAPN10"))
 select_signal <- select_data$signalValue
 
-pdf("signal_histogram_with_quantiles_and_certain_genes_highlighted.pdf")
-hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency")
-abline(v = quantiles, col='red', lty=3)
-abline(v = select_signal, col='blue', lty=3)
-dev.off()
+#pdf("signal_histogram_with_quantiles_and_certain_genes_highlighted.pdf")
+#hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency")
+#abline(v = quantiles, col='red', lty=3)
+#abline(v = select_signal, col='blue', lty=3)
+#dev.off()
 
 # Plot lines for genes including FASN, SMAD7
 select_data2 <- subset(joined_data, joined_data$Gene.Name %in% c("FASN", "SMAD7"))
@@ -55,4 +55,5 @@ hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency")
 abline(v = quantiles, col='black', lty=2)
 abline(v = select_signal, col='blue', lty=3)
 abline(v = select_signal2, col='red', lty=3)
+title("Histogram for MACS peak signal")
 dev.off()
