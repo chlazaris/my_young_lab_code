@@ -14,4 +14,4 @@ gene_tss=${input%.bed}.tss.bed
 
 extended_gene_tss=${gene_tss%.bed}.plus_minus_${extend_kb}kb.bed
 # Get a certain window around the TSS
-slopBed -i $gene_tss -g hg19.chrom.sizes -l $extend -r $extend -s  > $extended_gene_tss 
+slopBed -i $gene_tss -g hg19.chrom.sizes -l $extend -r $extend -s | sort | uniq | sortBed > $extended_gene_tss 
