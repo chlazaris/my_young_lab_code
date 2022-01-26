@@ -26,6 +26,6 @@ cat $gtf_file | grep -w transcript | \
 # Also, exclude everything that does not
 # belong to chromosomes 1..22, chrX
 cat $out1 | mergeBed -s -d 0 \
-	-c 4 -o collapse \
+	-c 4 -o distinct \
 	| awk '{print $1"\t"$2"\t"$3"\t"$5"\t"".""\t"$4}' \
 	| sort | uniq | sortBed > ${out1%.bed}.coord.bed
