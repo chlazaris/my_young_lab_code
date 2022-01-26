@@ -20,13 +20,13 @@ fi
 # to get it back in kilobases
 extend_kb=$(echo $extend / 1000 | bc)
 
+# Get name for the output file
+gene_tss=${input%.coord.bed}.tss.bed
+
 # Specify the TSS
 # based on the strand
 awk -F "\t" '{if ($6 == "+") {print  $1"\t"$2"\t"$2+1"\t"$4"\t"$5"\t"$6} \
-	else {print  $1"\t"$3-1"\t"$3"\t"$4"\t"$5"\t"$6}  }' $input > ${input%.bed}.tss.bed
-
-# Get name for the output file
-gene_tss=${input%.coord.bed}.tss.bed
+	else {print  $1"\t"$3-1"\t"$3"\t"$4"\t"$5"\t"$6}  }' $input > $gene_tss
 
 # Specify the name for the file with the extended TSS
 extended_gene_tss=${gene_tss%.bed}.plus_minus_${extend_kb}kb.bed
