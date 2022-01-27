@@ -29,24 +29,30 @@ if (length(args)!=2) {
 }
 
 # Read in the table 
-data <- read.table(sprintf("%s", args[1]), header=T, sep="\t", check.names=F, row.names=1)
+data <- read.table(sprintf("%s", args[1]), header=T, sep="\t", check.names=FALSE, stringsAsFactors=FALSE)
 
 # Convert the data to count matrix
-countdata <- as.matrix(data)
+countdata <- as.matrix(data[3:ncol(data)])
+countdata <- floor(countdata)
+rownames(countdata) <- data$gene_name
+head(countdata)
 
 # Read in the sample sheet
-coldata <- read.table(sprintf("%s", args[2]), header=T, sep="\t", check.names=F, row.names=1)
+coldata <- read.table(sprintf("%s", args[2]), header=T)
+head(coldata)
 
 # Convert the condition column to factor
-coldata$condition <- factor(coldata$condition, levels=c("DMF","cisplatin"))
+#coldata$condition <- factor(coldata$condition, levels=unique(coldata$condition))
+#head(coldata)
 
 # Run DESeq2
 dds <- DESeqDataSetFromMatrix(countData=countdata, colData=coldata, design=~condition)
 dds <- DESeq(dds)
+#head(dds)
 
 # Get the results
 res <- results(dds)
-head(res)
+#head(res)
 
 # Combine with normalized data
 resdata <- merge(as.data.frame(res), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
@@ -57,7 +63,7 @@ write.table(resdata, "all_deseq2_results.tsv", col.names=TRUE, row.names=FALSE, 
 # Get differentialy expressed genes
 diff_exp <- subset(resdata, abs(resdata$log2FoldChange)>1 & resdata$padj<0.05)
 head(diff_exp)
-write.table(diff_exp, "diff_expr_log2FC_1_padj_005.tsv", col.names=T, row.names=T, quote=F, sep="\t")
+write.table(diff_exp, "diff_expr_log2FC_1_padj_005.tsv", col.names=T, row.names=FALSE, quote=F, sep="\t")
 
 # Remove the ones with NA values
 # res2 <- subset(res, !is.na(res$log2FoldChange))
