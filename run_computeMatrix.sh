@@ -3,38 +3,22 @@
 # Get the number of arguments
 #if [ "$#" -ne 2 || "$#" -ne 3 || "$#" -ne 4 ]; then
 #	echo "Please provide the correct number of arguments..."
-#	echo "USAGE: run_computeMatrix.sh [.bed peaks] [file with .bw] [extend; default: 2kb] [order; default: descend]"
+#	echo "USAGE: run_computeMatrix.sh [.bed peaks] [extend; default: 2kb] [order; default: descend]"
 #	exit
-#fi	
-
-# Get the input (sort type) or set it to default
-peaks=$1
-file=$2
-extend=${3:-2000}
-order=${4:-descend}
-
-# Create a directory to save everything
-# The directory should have the name of the peaks file
-current_dir=$PWD
-outdir=$(basename $peaks | cut -d'_' -f1)
-
-if [ -d $outdir ]; then
-	echo "The directory $outdir already exists..."
-	exit
-else
-	mkdir $outdir
-fi
-
-#Generate the file with the relative paths to .bw
-cat $file | sed 's/^/bigwig\//' | sed 's/$/.bw/' > $outdir/bigwig.txt
-
-# Go to the new directory to generate the matrix
-cd $outdir
+#fi
 
 # Create the necessary links
 ln -s ../peaks
 ln -s ../../bigwig
-bw_files=$(cat bigwig.txt | tr '\n' '	')
+ln -s ../bigwig.txt
+
+# Get the input (sort type) or set it to default
+peaks=$1
+extend=${3:-2000}
+order=${4:-descend}
+
+#Generate the file with the relative paths to .bw
+bw_files=$(cat bigwig.txt | sed 's/^/bigwig\//' | sed 's/$/.bw/' | tr '\n' ' ')
 
 # Compute the matrix
 computeMatrix reference-point --referencePoint center -S $bw_files \

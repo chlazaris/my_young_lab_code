@@ -23,7 +23,7 @@ print(data)
 pdf(output)
 ggbarplot(data, x = col1, y = col2,
           fill = "blue",               # fill color
-          sort.val = "desc",          # Sort the value in dscending order
+          sort.val = "desc",          # Sort the value in descending order
           sort.by.groups = FALSE,     # Don't sort inside each group
           x.text.angle = 45           # Rotate vertically x axis texts
           )
