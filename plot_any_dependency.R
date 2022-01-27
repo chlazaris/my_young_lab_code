@@ -1,5 +1,8 @@
 #!/bin/Rscript
 
+# Install DepMap package
+#remotes::install_github("UCLouvain-CBIO/depmap", ref = "4a9f52ed6cf9c3821891ebdd9db317194d6518c9")
+
 # Load the required package
 library("dplyr")
 library("ggplot2")
@@ -28,7 +31,6 @@ depmap_release()
 ## create ExperimentHub query object
 eh <- ExperimentHub()
 q <- query(eh, "depmap")
-#q$preparerclass
 df <- data.frame(mcols(q))
 write.table(df, "entries.tsv", col.names=T, row.names=F, sep="\t")
 
@@ -37,10 +39,6 @@ write.table(df, "entries.tsv", col.names=T, row.names=F, sep="\t")
 crispr <- eh[["EH3081"]]
 tpm <- eh[["EH3084"]]
 metadata <- eh[["EH3086"]]
-
-colnames(crispr)
-colnames(tpm)
-colnames(metadata)
 
 # Specify the name of the label 
 x_label <- sprintf("CERES Dependency Score (%s)", genename)
@@ -71,10 +69,7 @@ write.table(crispr_df, outfile, col.names=TRUE, row.names=FALSE, quote=FALSE, se
 meta_crispr <- read.table(sprintf("%s", outfile), header=TRUE, sep="\t")
 meta_crispr$primary_disease <- with(meta_crispr, reorder(primary_disease, -dependency, median, na.rm=TRUE))
 
-# Isolate data of interest
-#select_line <- subset(meta_crispr, meta_crispr$cell_line=="MM1S_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE")
-#select_line
-
+# Get the output
 outfile1 <- paste(genename, "dependency_across_various_cancer_types_crispr.pdf", sep = "_")
 
 # Plot dependency across various types

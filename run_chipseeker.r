@@ -11,28 +11,38 @@ library(clusterProfiler)
 library(org.Hs.eg.db)
 
 # Load data
-samplefiles <- list.files(".", pattern= ".bed", full.names=T)
-samplefiles <- as.list(samplefiles)
-names(samplefiles) <- c("IKZF1")
+samplefiles <- list.files("peaks/", pattern= ".bed", full.names=T)
+#samplefiles <- as.list(samplefiles)
+samplefiles <- samplefiles[1]
+samplefiles
+#names(samplefiles) <- c("peaks")
+type(samplefiles)
 
 # Assign annotation db
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
-# Get annotations
-peakAnnoList <- lapply(samplefiles, annotatePeak, TxDb=txdb,
-                       tssRegion=c(-1000, 1000), verbose=FALSE)
+# Get annotations (define promoters as TSS +/-2kb)
+peakAnno <- annotatePeak(samplefiles, tssRegion=c(-2000, 2000), TxDb=txdb, verbose=FALSE, annoDb="org.Hs.eg.db")
+annotations <- as.data.frame(peakAnno)
+write.table(annotations, "peak_annotations.tsv", row.names=F, col.names=T, sep="\t", quote=F)
 
 # Plot the percentages of binding in features
-#pdf("binding_profile_piechart.pdf")
-#plotAnnoPie(peakAnnoList)
-#dev.off()
+pdf("binding_profile_piechart.pdf")
+plotAnnoPie(peakAnno)
+dev.off()
 
 pdf("binding_profile_barplot.pdf")
-plotAnnoBar(peakAnnoList)
+plotAnnoBar(peakAnno)
 dev.off()
 
-pdf("binding_profile_distance_from_TSS")
-plotDistToTSS(peakAnnoList)
+pdf("binding_profile_vennpie.pdf")
+vennpie(peakAnno)
 dev.off()
 
-#peak_annot_percent <- as.data.frame(peakAnnoList[[1]])
+pdf("binding_profile_vennpie_upsetplot.pdf")
+upsetplot(peakAnno, vennpie=TRUE)
+dev.off()
+
+pdf("binding_profile_distance_from_TSS.pdf")
+plotDistToTSS(peakAnno)
+dev.off()

@@ -10,4 +10,4 @@ fi
 input=$1
 
 # Convert to .bed
-cut -f1-6 $input | sed 's/^/chr/' | sortBed > ${input%.narrowPeak}.bed
+cut -f1-6 $input | sed 's/^/chr/' | sort | uniq | sortBed > ${input%.narrowPeak}.sorted.bed

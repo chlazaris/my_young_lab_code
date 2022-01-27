@@ -19,17 +19,27 @@ export XDG_CACHE_HOME=$NEW_CACHE
 echo 'Using $XDG_CACHE_HOME for cache'
 
 # Check the number of arguments
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
 	echo "Please provide the correct number of arguments..."
-	echo "USAGE: run_gimmemotifs.sh [INPUT-FILE (.bed with peak summits)]"
+	echo "USAGE: run_gimmemotifs.sh [INPUT-FILE (peak file; narrowPeak, bed)] [MOTIF status (known, denovo)]"
 	exit 1
 fi
 
+# Get the input
+input=$1
+motif_status=$2
+
 # Get the output directory
-outdir=${input%.bed}.motifs
+outdir=$(basename $input | sed 's/bed/motifs/')
 
 # Run gimmemotifs
-gimme motifs $input $outdir -p JASPAR2020_vertebrates -g hg19 --known
+if [ "$motif_status" == "known" ]; then
+        gimme motifs $input $outdir -p JASPAR2020_vertebrates -g hg19 --size 200 --known
+elif [ "$motif_status" == 'denovo' ]; then
+        gimme motifs $input $outdir -g hg19 --size 200 --denovo
+else
+	echo "Invalid motif status: Please provide motif status known or denovo"
+fi
 
 # Deactivate the conda environment
 conda deactivate

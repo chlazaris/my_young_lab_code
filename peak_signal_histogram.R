@@ -9,7 +9,6 @@ args <- commandArgs(trailingOnly=TRUE)
 
 # Get the file with the signal for peaks
 signal <- read.table(args[1], header=F, sep="\t", check.names=F)
-head(signal)
 colnames(signal) <- c("chrom","chromStart","chromEnd","PeakID",
 		      "score","strand","signalValue","pValue",
 		      "qValue","peak")
@@ -17,7 +16,6 @@ colnames(signal) <- c("chrom","chromStart","chromEnd","PeakID",
 # Get the gene annotations
 annots <- data.frame(read_tsv(args[2]))
 colnames(annots)[1] <- c("PeakID")
-head(annots)
 
 # Join the two
 joined_data <- inner_join(signal, annots, by="PeakID")
@@ -31,10 +29,10 @@ sink("quantiles.txt")
 print(quantiles)
 sink()
 
-pdf("signal_histogram_with_quantiles.pdf")
-hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency")
-abline(v = quantiles, col='red', lty=3)
-dev.off()
+#pdf("signal_histogram_with_quantiles.pdf")
+#hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency")
+#abline(v = quantiles, col='red', lty=3)
+#dev.off()
 
 # Plot lines for certain genes
 select_data <- subset(joined_data, joined_data$Gene.Name %in% c("TIMM22", "LARS", "GSK3A", "FTO", "PANK3", "TSC2", "CAPN10"))
@@ -51,9 +49,8 @@ select_data2 <- subset(joined_data, joined_data$Gene.Name %in% c("FASN", "SMAD7"
 select_signal2 <- select_data2$signalValue
 
 pdf("signal_histogram_with_quantiles_and_genes_highlighted.pdf")
-hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency")
+hist(joined_data$signalValue, n=100, xlab="Peak signal", ylab="Frequency", main="Histogram for MACS peak signal")
 abline(v = quantiles, col='black', lty=2)
 abline(v = select_signal, col='blue', lty=3)
 abline(v = select_signal2, col='red', lty=3)
-title("Histogram for MACS peak signal")
 dev.off()
