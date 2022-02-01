@@ -28,21 +28,23 @@ if [ ! -f ${gtf_file}.gtf ]; then
 fi
 
 # Extract the transcript coordinates
+# Remove chromosomes M and Y (as Y not everywhere)
 if [ ! -f ${gtf_file}.bed ]; then
-	cat ${gtf_file}.gtf | gtf2bed | grep -w transcript | grep -vE 'Un_|hap|random|chrM' | cut -f1-6 | sortBed > ${gtf_file}.bed
+	cat ${gtf_file}.gtf | gtf2bed | grep -w transcript | grep -vE 'Un_|hap|random|chrM|chrY' | cut -f1-6 | sort | uniq | sortBed > ${gtf_file}.bed
 fi
 
 # Extract the TSS
 if [ ! -f ${gtf_file}.tss.bed ]; then
-	cat ${gtf_file}.bed | awk '{if ($6 == "+") {print  $1"\t"$2"\t"$2+1"\t"$4"\t"$5"\t"$6} else {print  $1"\t"$3-1"\t"$3"\t"$4"\t"$5"\t"$6}}' | sortBed > ${gtf_file}.tss.tmp
+	cat ${gtf_file}.bed | awk '{if ($6 == "+") {print  $1"\t"$2"\t"$2+1"\t"$4"\t"$5"\t"$6} else {print  $1"\t"$3-1"\t"$3"\t"$4"\t"$5"\t"$6}}' | sort | uniq | sortBed > ${gtf_file}.tss.tmp
 	bedtools merge -s -c 4 -o distinct -i ${gtf_file}.tss.tmp \
-		| awk '{print $1"\t"$2"\t"$3"\t"$5"\t"".""\t"$4}' | sortBed > ${gtf_file}.tss.bed 
+		| awk '{print $1"\t"$2"\t"$3"\t"$5"\t"".""\t"$4}' | sort | uniq | sortBed > ${gtf_file}.tss.bed
+	rm -rf ${gtf_file}.tss.tmp	
 fi
 
 # Extend the TSS
 ext_in_kb=$(echo $extension/1000 | bc)
 if [ ! -f ${gtf_file}.tss.plus.minus.${extension}kb.bed ]; then
-	slopBed -i ${gtf_file}.tss.bed -s -g $chr_sizes -l $extension -r $extension | sortBed > ${gtf_file}.tss.plus.minus.${ext_in_kb}kb.bed	
+	slopBed -i ${gtf_file}.tss.bed -s -g $chr_sizes -l $extension -r $extension | sort | uniq | sortBed > ${gtf_file}.tss.plus.minus.${ext_in_kb}kb.bed	
 fi
 
 # Merge transcripts or genes that
