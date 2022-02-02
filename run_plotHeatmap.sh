@@ -3,22 +3,23 @@
 # Check for the number of args
 #if [ $# -ne 1 ]; then
 #        echo "Please provide the correct number of arguments..."
-#        echo "USAGE: plot_heatmap.sh MATRIX_FILE"
+#        echo "USAGE: plot_heatmap.sh MATRIX_FILE COLOR_SCHEME [default: Reds] [MAX-VALUES]"
 #        exit 1
 #fi
 
 # Get the matrix file as input
 matrix=$1
 color_scheme=${2:-'Reds'}
-#values=$3
+values=$3
 
 # Get the name for the output heatmap file
 outfile=${matrix%.gz}.pdf
 
 if [ $color_scheme == 'Reds' ]; then
 	# Plot a heatmap
-	plotHeatmap -m $matrix --dpi 300 --colorMap 'Reds' \
+	echo plotHeatmap -m $matrix --dpi 300 --colorMap 'Reds' \
 		--missingDataColor '#FFFFFF' --averageTypeSummaryPlot mean \
+		--sortUsingSamples 1 \
 		--whatToShow 'heatmap and colorbar' -x "Distance" -z "Peaks" -o $outfile
 else
 	# Specify the colors for the heatmaps
@@ -26,14 +27,17 @@ else
 	echo $colors
 
 	# Specify the max values for the heatmaps
-	max_values=$(perl -pe 'chomp if eof' $values | tr '\n' ' ')
-   
-	missing_color='#FFFFFF'
+	max_values=$(perl -pe 'chomp if eof' $values | tr '\n' ' ') 
 	echo $max_values
 
 	# Plot a heatmap
-	plotHeatmap -m ${matrix} --dpi 300 --colorList ${colors}\
-	    --missingDataColor '#FFFFFF' --averageTypeSummaryPlot mean\
-	    --zMax ${max_values} --whatToShow 'heatmap and colorbar'\
-	    -x "Distance" -z "Peaks" -o $outfile
+	echo plotHeatmap -m $matrix --dpi 300 \
+		--missingDataColor "'#FFFFFF'" --averageTypeSummaryPlot mean \
+		--sortUsingSamples 1 \
+		--whatToShow \"'heatmap and colorbar'\" -x "Distance" -z "Peaks" --zMax $max_values --colorList $colors \
+		-o $outfile > command
+	chmod a+x command
+	./command
+	# Get rid of the command file
+	rm -rf command
 fi
