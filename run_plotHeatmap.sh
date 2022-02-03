@@ -24,11 +24,9 @@ if [ $color_scheme == 'Reds' ]; then
 else
 	# Specify the colors for the heatmaps
 	colors=$(perl -pe 'chomp if eof' $color_scheme | sed 's/^/\"white,/' | sed 's/$/\"/' | tr '\n' ' ')
-	echo $colors
 
 	# Specify the max values for the heatmaps
 	max_values=$(perl -pe 'chomp if eof' $values | tr '\n' ' ') 
-	echo $max_values
 
 	# Plot a heatmap
 	echo plotHeatmap -m $matrix --dpi 300 \
