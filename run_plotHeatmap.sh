@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Check for the number of args
-#if [ $# -ne 1 ]; then
-#        echo "Please provide the correct number of arguments..."
-#        echo "USAGE: plot_heatmap.sh MATRIX_FILE COLOR_SCHEME [default: Reds] [MAX-VALUES]"
-#        exit 1
-#fi
+if [ "$#" -lt 1 ] || [ "$#" -gt 3 ]; then
+        echo "Please provide the correct number of arguments..."
+        echo "USAGE: plot_heatmap.sh MATRIX_FILE COLOR_SCHEME [default: Reds] [MAX-VALUES]"
+        exit 1
+fi
 
 # Get the matrix file as input
 matrix=$1
@@ -17,7 +17,7 @@ outfile=${matrix%.gz}.pdf
 
 if [ $color_scheme == 'Reds' ]; then
 	# Plot a heatmap
-	echo plotHeatmap -m $matrix --dpi 300 --colorMap 'Reds' \
+	plotHeatmap -m $matrix --dpi 300 --colorMap 'Reds' \
 		--missingDataColor '#FFFFFF' --averageTypeSummaryPlot mean \
 		--sortUsingSamples 1 \
 		--whatToShow 'heatmap and colorbar' -x "Distance" -z "Peaks" -o $outfile
@@ -32,7 +32,7 @@ else
 	echo plotHeatmap -m $matrix --dpi 300 \
 		--missingDataColor "'#FFFFFF'" --averageTypeSummaryPlot mean \
 		--sortUsingSamples 1 \
-		--whatToShow \"'heatmap and colorbar'\" -x "Distance" -z "Peaks" --zMax $max_values --colorList $colors \
+		--whatToShow \"heatmap and colorbar\" -x "Distance" -z "Peaks" --zMax $max_values --colorList $colors \
 		-o $outfile > command
 	chmod a+x command
 	./command
