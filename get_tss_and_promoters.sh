@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script extracts the gene coordinates using
-# Refseq genes as input (the .gtf file from UCSC; hg19.refGene.gtf)
+# Refseq genes as input (the .gtf file from UCSC; checked for hg19 and mm9)
 
 # Check for the number of arguments
 if [ $# -ne 2 ]; then
@@ -14,12 +14,15 @@ fi
 extension=$1
 chr_sizes=$2
 
+# Extract the genome name
+genome=$(echo $chr_sizes | cut -d'.' -f1)
+
 # Specify the name of the .gtf file
-gtf_file="hg19.refGene"
+gtf_file=$genome.refGene
 
 # Download the .gtf if it does not exist
 if [ ! -f ${gtf_file}.gtf.gz ]; then
-	wget "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/genes/hg19.refGene.gtf.gz" -O ${gtf_file}.gtf.gz
+	wget "https://hgdownload.soe.ucsc.edu/goldenPath/$genome/bigZips/genes/$genome.refGene.gtf.gz" -O ${gtf_file}.gtf.gz
 fi
 
 # Check if the decompressed file exists
